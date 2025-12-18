@@ -12,6 +12,18 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.SmartGarmentShop">
         <activity
+            android:name=".Welcome_Page"
+            android:exported="false" />
+        <activity
+            android:name=".Splash_Screen"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity
             android:name=".MainActivity"
             android:exported="true">
             <intent-filter>
