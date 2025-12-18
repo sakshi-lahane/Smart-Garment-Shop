@@ -2,6 +2,7 @@ package com.clg.smart_garment_shop;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
@@ -17,13 +18,20 @@ public class Splash_Screen extends AppCompatActivity {
 
         ImageView logo = findViewById(R.id.logoImage);
 
-        Animation animation = AnimationUtils.loadAnimation(this, R.anim.logo_anim);
+        // Load animation (JAVA syntax)
+        Animation animation = AnimationUtils.loadAnimation(
+                Splash_Screen.this, R.anim.logo_anim);
+
         logo.startAnimation(animation);
 
         // Move to Welcome Screen after animation
-        new android.os.Handler().postDelayed(() -> {
-            startActivity(new Intent(Splash_Screen.this, Welcome_Page.class));
-            finish();
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                startActivity(
+                        new Intent(Splash_Screen.this, Welcome_Page.class));
+                finish();
+            }
         }, 2000);
     }
 }
