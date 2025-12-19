@@ -11,27 +11,27 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.SmartGarmentShop">
-
-        <!-- Splash Screen (ONLY LAUNCHER) -->
+        <activity
+            android:name=".Login_Page"
+            android:exported="false" />
+        <activity
+            android:name=".Register_Page"
+            android:exported="false" /> <!-- Splash Screen (ONLY LAUNCHER) -->
         <activity
             android:name=".Splash_Screen"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-        </activity>
-
-        <!-- Welcome Screen -->
+        </activity> <!-- Welcome Screen -->
         <activity
             android:name=".Welcome_Page"
-            android:exported="false" />
-
-        <!-- Main Activity (NO LAUNCHER) -->
+            android:exported="false" /> <!-- Main Activity (NO LAUNCHER) -->
         <activity
             android:name=".MainActivity"
             android:exported="false" />
-
     </application>
 
 </manifest>
