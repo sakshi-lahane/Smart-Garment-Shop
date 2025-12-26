@@ -1,5 +1,6 @@
 package com.clg.smart_garment_shop;
 
+import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.activity.EdgeToEdge;
@@ -8,7 +9,11 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
+import com.google.android.material.button.MaterialButton;
+
 public class Welcome_Page extends AppCompatActivity {
+
+    MaterialButton btnGetStarted;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -16,6 +21,12 @@ public class Welcome_Page extends AppCompatActivity {
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_welcome_page);
 
+        btnGetStarted = findViewById(R.id.btnGetStarted);
+
+            btnGetStarted.setOnClickListener(v -> {
+                Intent intent = new Intent(Welcome_Page.this,Register_Page.class);
+                startActivity(intent);
+            });
 
     }
 }

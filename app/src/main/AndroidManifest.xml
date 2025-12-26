@@ -12,6 +12,9 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.SmartGarmentShop">
         <activity
+            android:name=".Forget_Password"
+            android:exported="false" />
+        <activity
             android:name=".Login_Page"
             android:exported="false" />
         <activity
