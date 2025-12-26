@@ -12,7 +12,7 @@ import androidx.core.view.WindowInsetsCompat;
 
 public class Login_Page extends AppCompatActivity {
 
-    TextView textView;
+    TextView tvForgetPassword,tvSignUp;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -20,8 +20,14 @@ public class Login_Page extends AppCompatActivity {
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_login_page);
 
-        textView=findViewById(R.id.tvForgotPassword);
-        textView.setOnClickListener(v -> {
+        tvForgetPassword=findViewById(R.id.tvForgotPassword);
+        tvSignUp=findViewById(R.id.tvSignup);
+
+        tvSignUp.setOnClickListener(v -> {
+            Intent intent = new Intent(Login_Page.this,Register_Page.class);
+            startActivity(intent);
+        });
+        tvForgetPassword.setOnClickListener(v -> {
             Intent intent = new Intent(Login_Page.this,Forget_Password.class);
             startActivity(intent);
         });

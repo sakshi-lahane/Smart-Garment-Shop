@@ -1,90 +1,74 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:fillViewport="true"
-    android:background="#F2FFFFFF">
+    android:background="#FFFFFF">
 
-    <RelativeLayout
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:gravity="center"
         android:padding="24dp">
 
         <!-- Image -->
         <ImageView
             android:id="@+id/imgWelcome"
-            android:layout_width="350dp"
-            android:layout_height="330dp"
-            android:layout_centerHorizontal="true"
+            android:layout_width="260dp"
+            android:layout_height="260dp"
+            android:src="@drawable/welcome_clothes"
             android:scaleType="fitCenter"
-            android:layout_marginTop="200dp"
-            android:src="@drawable/welcome_clothes" />
+            android:layout_marginBottom="24dp" />
 
         <!-- Title -->
         <TextView
             android:id="@+id/txtTitle"
-            android:layout_width="387dp"
-            android:layout_height="130dp"
-            android:layout_below="@id/imgWelcome"
-            android:gravity="center"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:text="Manage Your Garment Shop\nSmarter"
+            android:textSize="26sp"
+            android:textStyle="bold"
             android:textColor="#000000"
-            android:textSize="25sp"
-            android:textStyle="bold" />
+            android:gravity="center"
+            android:layout_marginBottom="8dp" />
 
         <!-- Subtitle -->
-
-        <!-- Spacer (pushes button downward naturally) -->
-
-        <!-- Get Started Button -->
-
-        <!-- Login -->
         <TextView
             android:id="@+id/txtSubtitle"
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@id/txtTitle"
-            android:layout_marginTop="-25dp"
-            android:gravity="center"
             android:text="Stock • Billing • Reports • SMS"
-            android:textColor="@color/black"
-            android:textStyle="normal"
-            android:textSize="15dp" />
+            android:textSize="14sp"
+            android:textColor="#666666"
+            android:gravity="center"
+            android:layout_marginBottom="32dp" />
 
-<!--        <View-->
-<!--            android:id="@+id/spacer"-->
-<!--            android:layout_width="match_parent"-->
-<!--            android:layout_height="120dp"-->
-<!--            android:layout_below="@id/txtSubtitle"-->
-<!--            android:layout_marginTop="10dp" />-->
-
+        <!-- Button -->
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnGetStarted"
             android:layout_width="match_parent"
-            android:layout_height="52dp"
-            android:layout_below="@+id/txtSubtitle"
+            android:layout_height="54dp"
             android:text="Get Started"
             android:textAllCaps="false"
-            android:textColor="#FFFFFF"
-            android:textSize="16sp"
             android:textStyle="bold"
-            android:layout_marginTop="100dp"
+            android:textSize="16sp"
+            android:textColor="#FFFFFF"
             android:background="@drawable/btn_orange"
             app:backgroundTint="@null"
-            app:cornerRadius="8dp" />
+            app:cornerRadius="12dp" />
 
+        <!-- Login -->
         <TextView
             android:id="@+id/txtLogin"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@id/btnGetStarted"
-            android:layout_centerHorizontal="true"
-            android:layout_marginTop="15dp"
             android:text="Already have an account? Login"
             android:textSize="14sp"
+            android:textStyle="bold"
             android:textColor="#FF6A00"
-            android:textStyle="bold" />
+            android:layout_marginTop="16dp" />
 
-    </RelativeLayout>
+    </LinearLayout>
 </ScrollView>
