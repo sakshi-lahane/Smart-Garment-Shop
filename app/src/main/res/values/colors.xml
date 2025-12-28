@@ -1,5 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+
+    <!-- Existing -->
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+
+    <!-- Bottom Navigation Colors -->
+    <color name="bottom_nav_selected">#FF8A00</color>   <!-- Orange -->
+    <color name="bottom_nav_unselected">#9E9E9E</color> <!-- Grey -->
+
 </resources>

@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/nav_home"
+        android:icon="@drawable/home_bottom"
+        android:title="Home" />
+
+    <item
+        android:id="@+id/nav_stock"
+        android:icon="@drawable/stock_bottom"
+        android:title="Stock" />
+
+
+    <item
+        android:id="@+id/nav_create_bill"
+        android:icon="@drawable/add_bottom"
+        android:title="Create Bill" />
+
+
+    <item
+        android:id="@+id/nav_history"
+        android:icon="@drawable/history_bottom"
+        android:title="History" />
+
+
+
+    <item
+        android:id="@+id/nav_profile"
+        android:icon="@drawable/ic_person"
+        android:title="Profile" />
+
+</menu>
