@@ -31,7 +31,7 @@ public class MainActivity extends AppCompatActivity {
                 selectedFragment = new StockFragment();
             } else if (item.getItemId() == R.id.nav_create_bill) {
                 selectedFragment = new StockFragment();
-            } else if (item.getItemId() == R.id.nav_create_bill) {
+            } else if (item.getItemId() == R.id.nav_history) {
                 selectedFragment = new CreateBillFragment();
             } else if (item.getItemId() == R.id.nav_profile) {
                 selectedFragment = new ProfileFragment();
