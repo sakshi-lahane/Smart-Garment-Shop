@@ -8,6 +8,6 @@
 
     <!-- Unselected -->
     <item
-        android:color="@color/bottom_nav_unselected"/>
+        android:color="#958F8F"/>
 
 </selector>

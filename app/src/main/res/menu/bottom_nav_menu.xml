@@ -12,10 +12,7 @@
         android:title="Stock" />
 
 
-    <item
-        android:id="@+id/nav_create_bill"
-        android:icon="@drawable/add_bottom"
-        android:title="Create Bill" />
+
 
 
     <item
