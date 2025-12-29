@@ -1,42 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
 <androidx.coordinatorlayout.widget.CoordinatorLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#F4F6F8">
+    android:background="#F5F5F5">
 
-    <!-- Main Content -->
+    <!-- MAIN CONTENT -->
     <FrameLayout
-        android:id="@+id/fragmentContainer"
+        android:id="@+id/fragment_container"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"/>
+        android:layout_height="match_parent" />
 
-    <!-- BOTTOM APP BAR (WITH NOTCH) -->
-    <com.google.android.material.bottomappbar.BottomAppBar
-        android:id="@+id/bottomAppBar"
+    <!-- BOTTOM NAVIGATION -->
+    <com.google.android.material.bottomnavigation.BottomNavigationView
+        android:id="@+id/bottomNavigation"
         android:layout_width="match_parent"
-        android:layout_height="70dp"
+        android:layout_height="wrap_content"
         android:layout_gravity="bottom"
-        android:backgroundTint="@color/white"
-        app:fabCradleMargin="10dp"
-        app:fabCradleRoundedCornerRadius="36dp"
-        app:fabCradleVerticalOffset="10dp"
-        app:hideOnScroll="false"
+        android:background="@color/white"
         app:menu="@menu/bottom_nav_menu"
+        app:labelVisibilityMode="labeled"
+        app:itemIconSize="24dp"
         app:itemIconTint="@color/bottom_nav_color"
         app:itemTextColor="@color/bottom_nav_color" />
-
-    <!-- CENTER FAB -->
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/fabCreateBill"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:src="@drawable/add_bottom"
-        app:fabCustomSize="72dp"
-        app:backgroundTint="@color/bottom_nav_selected"
-        app:tint="@color/white"
-        app:elevation="12dp"
-        app:layout_anchor="@id/bottomAppBar"
-        app:layout_anchorGravity="center" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
