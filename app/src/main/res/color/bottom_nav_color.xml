@@ -8,6 +8,6 @@
 
     <!-- Unselected -->
     <item
-        android:color="#958F8F"/>
+        android:color="@color/black"/>
 
 </selector>
