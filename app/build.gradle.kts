@@ -1,10 +1,11 @@
 plugins {
     alias(libs.plugins.android.application)
+    alias(libs.plugins.google.gms.google.services)
 }
 
 android {
     namespace = "com.clg.smart_garment_shop"
-    compileSdk = 36   // OK if you are using latest preview / Canary
+    compileSdk = 36
 
     defaultConfig {
         applicationId = "com.clg.smart_garment_shop"
@@ -32,7 +33,7 @@ android {
     }
 
     buildFeatures {
-        viewBinding = true   // ✅ recommended
+        viewBinding = true
     }
 }
 
@@ -44,6 +45,11 @@ dependencies {
     implementation(libs.constraintlayout)
     implementation(libs.navigation.fragment)
     implementation(libs.navigation.ui)
+
+    // ✅ FIREBASE (CORRECT WAY)
+    implementation(platform("com.google.firebase:firebase-bom:33.7.0"))
+    implementation("com.google.firebase:firebase-auth")
+    implementation("com.google.firebase:firebase-database")
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)

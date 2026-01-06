@@ -9,4 +9,17 @@
     <color name="bottom_nav_selected">#FF8A00</color>   <!-- Orange -->
     <color name="bottom_nav_unselected">#9E9E9E</color> <!-- Grey -->
 
+    <!-- Primary Orange Color -->
+    <color name="orange">#FF9800</color>
+
+    <!-- Dark Orange (for pressed / toolbar) -->
+    <color name="orange_dark">#F57C00</color>
+
+    <!-- Light Orange (optional highlights) -->
+    <color name="orange_light">#FFE0B2</color>
+
+    <!-- Common Colors -->
+
+    <color name="gray">#9E9E9E</color>
+
 </resources>
