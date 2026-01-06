@@ -2,9 +2,9 @@ package com.clg.smart_garment_shop;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.util.Patterns;
+import android.view.View;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -14,7 +14,6 @@ import com.google.android.material.button.MaterialButton;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthUserCollisionException;
-import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
 public class Register_Page extends AppCompatActivity {
@@ -23,18 +22,19 @@ public class Register_Page extends AppCompatActivity {
     private TextInputEditText etShopName, etOwnerName, etEmail,
             etMobile, etPassword, etConfirmPassword;
     private MaterialButton btnCreateAccount;
+    private ProgressBar progressRegister;
     private TextView tvLogin;
 
     // Firebase
     private FirebaseAuth auth;
-    private DatabaseReference database;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        // 🔒 Auto redirect if already logged in
         auth = FirebaseAuth.getInstance();
+
+        // Auto login
         if (auth.getCurrentUser() != null) {
             startActivity(new Intent(this, MainActivity.class));
             finish();
@@ -43,10 +43,7 @@ public class Register_Page extends AppCompatActivity {
 
         setContentView(R.layout.activity_register_page);
 
-        // Firebase Database
-        database = FirebaseDatabase.getInstance().getReference("Users");
-
-        // UI init
+        // UI
         etShopName = findViewById(R.id.etShopName);
         etOwnerName = findViewById(R.id.etOwnerName);
         etEmail = findViewById(R.id.etEmail);
@@ -54,34 +51,11 @@ public class Register_Page extends AppCompatActivity {
         etPassword = findViewById(R.id.etPassword);
         etConfirmPassword = findViewById(R.id.etConfirmPassword);
         btnCreateAccount = findViewById(R.id.btnCreateAccount);
+        progressRegister = findViewById(R.id.progressRegister);
         tvLogin = findViewById(R.id.tvLogin);
 
-        // Clear errors while typing
-        TextWatcher clearErrorWatcher = new TextWatcher() {
-            @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
-            @Override public void afterTextChanged(Editable s) {}
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-                etShopName.setError(null);
-                etOwnerName.setError(null);
-                etEmail.setError(null);
-                etMobile.setError(null);
-                etPassword.setError(null);
-                etConfirmPassword.setError(null);
-            }
-        };
-
-        etShopName.addTextChangedListener(clearErrorWatcher);
-        etOwnerName.addTextChangedListener(clearErrorWatcher);
-        etEmail.addTextChangedListener(clearErrorWatcher);
-        etMobile.addTextChangedListener(clearErrorWatcher);
-        etPassword.addTextChangedListener(clearErrorWatcher);
-        etConfirmPassword.addTextChangedListener(clearErrorWatcher);
-
-        // Create Account button
         btnCreateAccount.setOnClickListener(v -> createAccount());
 
-        // Login redirect
         tvLogin.setOnClickListener(v -> {
             startActivity(new Intent(this, Login_Page.class));
             finish();
@@ -103,33 +77,28 @@ public class Register_Page extends AppCompatActivity {
             return;
         }
 
-        btnCreateAccount.setEnabled(false); // prevent double click
+        // Show progress
+        btnCreateAccount.setEnabled(false);
+        progressRegister.setVisibility(View.VISIBLE);
+
+
+
 
         auth.createUserWithEmailAndPassword(email, password)
                 .addOnCompleteListener(task -> {
 
+                    progressRegister.setVisibility(View.GONE);
                     btnCreateAccount.setEnabled(true);
+
 
                     if (task.isSuccessful()) {
 
-                        String uid = auth.getCurrentUser().getUid();
+                        Toast.makeText(this,
+                                "Account created successfully",
+                                Toast.LENGTH_SHORT).show();
 
-                        UserModel user = new UserModel(
-                                uid, shop, owner, email, mobile
-                        );
-
-                        database.child(uid).setValue(user)
-                                .addOnCompleteListener(dbTask -> {
-
-                                    // EVEN IF DATABASE FAILS, AUTH IS SUCCESS
-                                    Toast.makeText(this,
-                                            "Account created successfully",
-                                            Toast.LENGTH_SHORT).show();
-
-                                    startActivity(new Intent(this, MainActivity.class));
-                                    finish();
-                                });
-
+                        startActivity(new Intent(this, MainActivity.class));
+                        finish();
 
                     } else {
 
@@ -143,7 +112,7 @@ public class Register_Page extends AppCompatActivity {
 
                         } else {
                             Toast.makeText(this,
-                                    "Registration failed. Try again.",
+                                    "Registration failed. Check internet.",
                                     Toast.LENGTH_LONG).show();
                         }
                     }
@@ -207,12 +176,6 @@ public class Register_Page extends AppCompatActivity {
         if (password.length() < 6) {
             etPassword.setError("Minimum 6 characters");
             etPassword.requestFocus();
-            return false;
-        }
-
-        if (confirmPassword.isEmpty()) {
-            etConfirmPassword.setError("Confirm password required");
-            etConfirmPassword.requestFocus();
             return false;
         }
 

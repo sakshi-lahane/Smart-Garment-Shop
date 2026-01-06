@@ -216,18 +216,31 @@
                     android:layout_width="match_parent"/>
 
                 <!-- BUTTON -->
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/btnCreateAccount"
+                <FrameLayout
                     android:layout_width="match_parent"
-                    android:layout_height="52dp"
-                    android:text="Create Account"
-                    android:textAllCaps="false"
-                    android:textColor="#FFFFFF"
-                    android:textStyle="bold"
-                    android:layout_marginTop="24dp"
-                    android:background="@drawable/btn_orange"
-                    app:backgroundTint="@null"
-                    app:cornerRadius="12dp"/>
+                    android:layout_height="52dp">
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnCreateAccount"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:text="Create Account"
+                        android:textAllCaps="false"
+                        android:textColor="@android:color/white"
+                        app:cornerRadius="12dp"
+                        app:backgroundTint="@color/orange"/>
+
+                    <ProgressBar
+                        android:id="@+id/progressRegister"
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:layout_gravity="center"
+                        android:visibility="gone"
+                        android:indeterminateTint="@android:color/white"/>
+
+                </FrameLayout>
+
+
 
             </LinearLayout>
         </androidx.cardview.widget.CardView>
