@@ -2,7 +2,7 @@ package com.clg.smart_garment_shop;
 
 public class UserModel {
 
-    public String uid, shopName, ownerName, email, mobile;
+    public String uid, shopName, ownerName, email, mobile,createdAt;
 
     public UserModel() {}
 
@@ -14,5 +14,7 @@ public class UserModel {
         this.ownerName = ownerName;
         this.email = email;
         this.mobile = mobile;
+        long createdAt;
+
     }
 }

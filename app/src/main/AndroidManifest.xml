@@ -12,6 +12,15 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.SmartGarmentShop">
         <activity
+            android:name=".Edit_Product"
+            android:exported="false" />
+        <activity
+            android:name=".Product_List"
+            android:exported="false" />
+        <activity
+            android:name=".Add_Stock"
+            android:exported="false" />
+        <activity
             android:name=".Create_Bill_Form"
             android:exported="false" />
         <activity

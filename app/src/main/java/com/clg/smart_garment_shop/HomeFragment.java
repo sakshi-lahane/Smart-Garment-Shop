@@ -28,6 +28,14 @@ public class HomeFragment extends Fragment {
             startActivity(intent);
         });
 
+        // Add Stock Button
+        Button btnAddStock = view.findViewById(R.id.btnAddStock);
+
+        btnAddStock.setOnClickListener(v -> {
+            Intent intent = new Intent(getActivity(), Add_Stock.class);
+            startActivity(intent);
+        });
+
         return view;
     }
 }

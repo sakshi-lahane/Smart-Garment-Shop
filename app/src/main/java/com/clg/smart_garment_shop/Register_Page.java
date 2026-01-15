@@ -14,7 +14,10 @@ import com.google.android.material.button.MaterialButton;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthUserCollisionException;
-import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.firestore.FirebaseFirestore;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class Register_Page extends AppCompatActivity {
 
@@ -27,12 +30,14 @@ public class Register_Page extends AppCompatActivity {
 
     // Firebase
     private FirebaseAuth auth;
+    private FirebaseFirestore firestore;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         auth = FirebaseAuth.getInstance();
+        firestore = FirebaseFirestore.getInstance();
 
         // Auto login
         if (auth.getCurrentUser() != null) {
@@ -77,12 +82,8 @@ public class Register_Page extends AppCompatActivity {
             return;
         }
 
-        // Show progress
         btnCreateAccount.setEnabled(false);
         progressRegister.setVisibility(View.VISIBLE);
-
-
-
 
         auth.createUserWithEmailAndPassword(email, password)
                 .addOnCompleteListener(task -> {
@@ -90,15 +91,34 @@ public class Register_Page extends AppCompatActivity {
                     progressRegister.setVisibility(View.GONE);
                     btnCreateAccount.setEnabled(true);
 
-
                     if (task.isSuccessful()) {
 
-                        Toast.makeText(this,
-                                "Account created successfully",
-                                Toast.LENGTH_SHORT).show();
+                        String uid = auth.getCurrentUser().getUid();
 
-                        startActivity(new Intent(this, MainActivity.class));
-                        finish();
+                        Map<String, Object> userMap = new HashMap<>();
+                        userMap.put("shopName", shop);
+                        userMap.put("ownerName", owner);
+                        userMap.put("email", email);
+                        userMap.put("mobile", mobile);
+                        userMap.put("createdAt", System.currentTimeMillis());
+
+                        firestore.collection("users")
+                                .document(uid)
+                                .set(userMap)
+                                .addOnSuccessListener(unused -> {
+
+                                    Toast.makeText(this,
+                                            "Account created successfully",
+                                            Toast.LENGTH_SHORT).show();
+
+                                    startActivity(new Intent(this, MainActivity.class));
+                                    finish();
+                                })
+                                .addOnFailureListener(e -> {
+                                    Toast.makeText(this,
+                                            "Firestore error: " + e.getMessage(),
+                                            Toast.LENGTH_LONG).show();
+                                });
 
                     } else {
 
@@ -112,7 +132,7 @@ public class Register_Page extends AppCompatActivity {
 
                         } else {
                             Toast.makeText(this,
-                                    "Registration failed. Check internet.",
+                                    "Registration failed. Try again.",
                                     Toast.LENGTH_LONG).show();
                         }
                     }
