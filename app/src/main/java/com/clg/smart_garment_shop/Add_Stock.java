@@ -2,13 +2,14 @@ package com.clg.smart_garment_shop;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.ArrayAdapter;
-import android.widget.AutoCompleteTextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.android.material.button.MaterialButton;
+import com.google.android.material.textfield.MaterialAutoCompleteTextView;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -22,10 +23,12 @@ public class Add_Stock extends AppCompatActivity {
     private TextInputEditText etProductName, etColor, etPrice, etQuantity;
     private MaterialButton btnAddStock, btnCancel;
 
-    private AutoCompleteTextView spCategory, spSubCategory, spSize;
+    private MaterialAutoCompleteTextView spCategory, spSubCategory, spSize;
 
     private FirebaseFirestore db;
     private FirebaseAuth auth;
+
+    private static final String TAG = "AddStockDebug";
 
     private ArrayAdapter<String> categoryAdapter, subCategoryAdapter, sizeAdapter;
 
@@ -44,11 +47,7 @@ public class Add_Stock extends AppCompatActivity {
         setupDropdowns();
 
         btnAddStock.setOnClickListener(v -> addStock());
-
-        btnCancel.setOnClickListener(v -> finish()); // Close screen
-
-
-
+        btnCancel.setOnClickListener(v -> finish());
     }
 
     private void initViews() {
@@ -66,23 +65,18 @@ public class Add_Stock extends AppCompatActivity {
 
     private void setupDropdowns() {
 
-        String[] categories = {
-                "Men", "Women", "Kids", "Footwear", "Accessories"
-        };
+        String[] categories = {"Men", "Women", "Kids", "Footwear", "Accessories"};
 
         categoryAdapter = new ArrayAdapter<>(this,
                 android.R.layout.simple_dropdown_item_1line, categories);
-
         spCategory.setAdapter(categoryAdapter);
 
-        // ---------- SUBCATEGORY MAP ----------
         subCategoryMap.put("Men", new String[]{"Shirts", "T-Shirts", "Jeans", "Trousers", "Jackets"});
         subCategoryMap.put("Women", new String[]{"Kurtis", "Sarees", "Dresses", "Tops"});
         subCategoryMap.put("Kids", new String[]{"Frocks", "T-Shirts", "Shorts", "Sets"});
         subCategoryMap.put("Footwear", new String[]{"Shoes", "Sandals", "Slippers"});
         subCategoryMap.put("Accessories", new String[]{"Belts", "Caps", "Wallets", "Bags"});
 
-        // ---------- SIZE MAP ----------
         sizeMap.put("Men", new String[]{"S", "M", "L", "XL", "XXL"});
         sizeMap.put("Women", new String[]{"S", "M", "L", "XL"});
         sizeMap.put("Kids", new String[]{"1Y", "2Y", "3Y", "4Y", "5Y"});
@@ -92,22 +86,18 @@ public class Add_Stock extends AppCompatActivity {
         spCategory.setOnItemClickListener((parent, view, position, id) -> {
             String selectedCategory = spCategory.getText().toString();
 
-            // Update Subcategory
             if (subCategoryMap.containsKey(selectedCategory)) {
                 subCategoryAdapter = new ArrayAdapter<>(this,
                         android.R.layout.simple_dropdown_item_1line,
                         subCategoryMap.get(selectedCategory));
-
                 spSubCategory.setAdapter(subCategoryAdapter);
                 spSubCategory.setText("");
             }
 
-            // Update Size
             if (sizeMap.containsKey(selectedCategory)) {
                 sizeAdapter = new ArrayAdapter<>(this,
                         android.R.layout.simple_dropdown_item_1line,
                         sizeMap.get(selectedCategory));
-
                 spSize.setAdapter(sizeAdapter);
                 spSize.setText("");
             }
@@ -116,7 +106,10 @@ public class Add_Stock extends AppCompatActivity {
 
     private void addStock() {
 
+        Log.d(TAG, "Add stock button clicked");
+
         if (auth.getCurrentUser() == null) {
+            Log.e(TAG, "User is null");
             Toast.makeText(this, "Please login first", Toast.LENGTH_SHORT).show();
             return;
         }
@@ -158,7 +151,6 @@ public class Add_Stock extends AppCompatActivity {
         productMap.put("color", color);
         productMap.put("price", price);
         productMap.put("quantity", quantity);
-        productMap.put("createdAt", System.currentTimeMillis());
 
         db.collection("users")
                 .document(userId)
@@ -167,22 +159,10 @@ public class Add_Stock extends AppCompatActivity {
                 .set(productMap)
                 .addOnSuccessListener(unused -> {
                     Toast.makeText(this, "Stock added successfully", Toast.LENGTH_SHORT).show();
-
-                    // Open product list screen
                     startActivity(new Intent(Add_Stock.this, Product_List.class));
-                    finish(); // close add stock page
+                    finish();
                 })
                 .addOnFailureListener(e ->
                         Toast.makeText(this, "Error: " + e.getMessage(), Toast.LENGTH_SHORT).show());
-    }
-
-    private void clearFields() {
-        etProductName.setText("");
-        spCategory.setText("");
-        spSubCategory.setText("");
-        spSize.setText("");
-        etColor.setText("");
-        etPrice.setText("");
-        etQuantity.setText("");
     }
 }

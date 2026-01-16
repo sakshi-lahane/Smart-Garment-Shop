@@ -12,7 +12,10 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.SmartGarmentShop">
         <activity
-            android:name=".Edit_Product"
+            android:name=".ViewStock"
+            android:exported="false" />
+        <activity
+            android:name=".UpdateStock"
             android:exported="false" />
         <activity
             android:name=".Product_List"

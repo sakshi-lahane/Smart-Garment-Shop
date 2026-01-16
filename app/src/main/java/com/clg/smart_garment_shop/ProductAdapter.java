@@ -6,8 +6,9 @@ import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -20,7 +21,7 @@ import java.util.List;
 public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ViewHolder> {
 
     Context context;
-    List<ProductModel> list; // ✅ Correct type
+    List<ProductModel> list;
 
     public ProductAdapter(Context context, List<ProductModel> list) {
         this.context = context;
@@ -30,44 +31,75 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ViewHold
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View v = LayoutInflater.from(context).inflate(R.layout.row_product, parent, false);
-        return new ViewHolder(v);
+        View view = LayoutInflater.from(context).inflate(R.layout.row_product, parent, false);
+        return new ViewHolder(view);
     }
 
     @Override
-    public void onBindViewHolder(@NonNull ViewHolder h, int i) {
-        ProductModel p = list.get(i);
+    public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
+        ProductModel model = list.get(position);
 
-        h.tvName.setText(p.getProductName());
-        h.tvDetails.setText(p.getCategory() + " | " + p.getSize() + " | ₹" + p.getPrice());
+        holder.tvName.setText(model.getProductName());
+        holder.tvDetails.setText("Qty: " + model.getQuantity() + " | ₹" + model.getPrice());
 
-        h.btnDelete.setOnClickListener(v -> deleteProduct(p.getProductId()));
-
-        h.btnEdit.setOnClickListener(v -> {
-            Intent intent = new Intent(context, Edit_Product.class);
-            intent.putExtra("productId", p.getProductId());
+        // 🔥 OPEN VIEW PAGE
+        holder.itemView.setOnClickListener(v -> {
+            Intent intent = new Intent(context, ViewStock.class);
+            intent.putExtra("name", model.getProductName());
+            intent.putExtra("category", model.getCategory());
+            intent.putExtra("subcategory", model.getSubCategory());
+            intent.putExtra("size", model.getSize());
+            intent.putExtra("color", model.getColor());
+            intent.putExtra("price", String.valueOf(model.getPrice()));
+            intent.putExtra("quantity", String.valueOf(model.getQuantity()));
             context.startActivity(intent);
+        });
+
+        // ✏️ EDIT
+        holder.btnEdit.setOnClickListener(v -> {
+            Intent intent = new Intent(context, UpdateStock.class);
+            intent.putExtra("id", model.getProductId());
+            intent.putExtra("name", model.getProductName());
+            intent.putExtra("category", model.getCategory());
+            intent.putExtra("subcategory", model.getSubCategory());
+            intent.putExtra("size", model.getSize());
+            intent.putExtra("color", model.getColor());
+            intent.putExtra("price", String.valueOf(model.getPrice()));
+            intent.putExtra("quantity", String.valueOf(model.getQuantity()));
+            context.startActivity(intent);
+        });
+
+        // 🗑 DELETE
+        holder.btnDelete.setOnClickListener(v -> {
+            showDeleteDialog(model.getProductId(), position);
         });
     }
 
-    private void deleteProduct(String productId) {
-        String uid = FirebaseAuth.getInstance().getUid();
+    private void showDeleteDialog(String productId, int position) {
+        new AlertDialog.Builder(context)
+                .setTitle("Delete Product")
+                .setMessage("Are you sure?")
+                .setPositiveButton("Yes", (dialog, which) -> deleteProduct(productId, position))
+                .setNegativeButton("Cancel", null)
+                .show();
+    }
 
+    private void deleteProduct(String productId, int position) {
+        String uid = FirebaseAuth.getInstance().getUid();
         if (uid == null) return;
 
-        new AlertDialog.Builder(context)
-                .setTitle("Delete")
-                .setMessage("Are you sure?")
-                .setPositiveButton("Yes", (d, w) -> {
-                    FirebaseFirestore.getInstance()
-                            .collection("users")
-                            .document(uid)
-                            .collection("products")
-                            .document(productId)
-                            .delete();
-                })
-                .setNegativeButton("No", null)
-                .show();
+        FirebaseFirestore.getInstance()
+                .collection("users")
+                .document(uid)
+                .collection("products")
+                .document(productId)
+                .delete()
+                .addOnSuccessListener(unused -> {
+                    list.remove(position);
+                    notifyItemRemoved(position);
+                    notifyItemRangeChanged(position, list.size());
+                    Toast.makeText(context, "Deleted", Toast.LENGTH_SHORT).show();
+                });
     }
 
     @Override
@@ -76,15 +108,16 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ViewHold
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
-        TextView tvName, tvDetails;
-        Button btnEdit, btnDelete;
 
-        public ViewHolder(@NonNull View v) {
-            super(v);
-            tvName = v.findViewById(R.id.tvName);
-            tvDetails = v.findViewById(R.id.tvDetails);
-            btnEdit = v.findViewById(R.id.btnEdit);
-            btnDelete = v.findViewById(R.id.btnDelete);
+        TextView tvName, tvDetails;
+        ImageView btnEdit, btnDelete;
+
+        public ViewHolder(@NonNull View itemView) {
+            super(itemView);
+            tvName = itemView.findViewById(R.id.tvName);
+            tvDetails = itemView.findViewById(R.id.tvDetails);
+            btnEdit = itemView.findViewById(R.id.btnEdit);
+            btnDelete = itemView.findViewById(R.id.btnDelete);
         }
     }
 }

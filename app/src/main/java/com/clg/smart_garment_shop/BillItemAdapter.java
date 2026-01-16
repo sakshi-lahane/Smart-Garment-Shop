@@ -20,7 +20,7 @@ public class BillItemAdapter extends RecyclerView.Adapter<BillItemAdapter.ViewHo
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View v = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.row_bill_item, parent, false);
+                .inflate(R.layout.row_product, parent, false);
         return new ViewHolder(v);
     }
 
@@ -42,9 +42,9 @@ public class BillItemAdapter extends RecyclerView.Adapter<BillItemAdapter.ViewHo
 
         ViewHolder(View v) {
             super(v);
-            tvName = v.findViewById(R.id.tvItemName);
-            tvQty = v.findViewById(R.id.tvQty);
-            tvPrice = v.findViewById(R.id.tvPrice);
+            tvName = v.findViewById(R.id.etProductName);
+            tvQty = v.findViewById(R.id.tvDetails);
+//            tvPrice = v.findViewById(R.id.tvPrice);
         }
     }
 }
