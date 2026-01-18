@@ -1,81 +1,97 @@
 package com.clg.smart_garment_shop;
 
-import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
+import android.content.Intent;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
+import android.view.View;
 import android.widget.*;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.*;
 
+import java.text.SimpleDateFormat;
 import java.util.*;
 
-public class Create_Bill_Form extends AppCompatActivity {
+public class Create_Bill_Form extends AppCompatActivity
+        implements BillItemAdapter.OnBillChangeListener {
 
-    EditText etCustomerName, etCustomerMobile, etSearchItem, etDiscount;
-    TextView tvSubtotal, tvGST, tvGrandTotal;
+    EditText etCustomerName, etCustomerMobile, etDiscount;
+    AutoCompleteTextView etSearchItem;
+    TextView tvSubtotal, tvGrandTotal, tvShopName, tvOwnerName, tvBillNo, tvDate;
     Spinner spPaymentMode;
     RecyclerView rvBillItems;
-    Button btnAddItem, btnGenerateInvoice;
+    Button btnGenerateInvoice;
+    ImageButton btnBack;
 
     List<BillItemModel> billItems = new ArrayList<>();
     BillItemAdapter billAdapter;
 
     double subtotal = 0.0;
-    double gst = 0.0;
 
     FirebaseFirestore firestore;
-    SQLiteDatabase db;
+    FirebaseAuth auth;
+
+    List<String> productNames = new ArrayList<>();
+    ArrayAdapter<String> productAdapter;
+
+    int billCounter = 1000;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_create_bill_form);
 
-        try {
-            bindViews();
-            setupRecyclerView();
-            setupDatabase();
-            setupSpinner();
-            setupButtons();
-        } catch (Exception e) {
-            Toast.makeText(this, "Initialization error: " + e.getMessage(), Toast.LENGTH_LONG).show();
-        }
+        firestore = FirebaseFirestore.getInstance();
+        auth = FirebaseAuth.getInstance();
+
+        bindViews();
+        setupRecyclerView();
+        setupSpinner();
+
+        AutoFixUserData.fixIfMissing(this);
+        loadHeaderData();
+        loadProductNames();
+        loadBillNumber();
+        setTodayDate();
+        setupDiscountListener();
+        setupDropdownAutoAdd();
+        toggleRecyclerVisibility();
+
+        btnGenerateInvoice.setOnClickListener(v -> generateBill());
+        btnBack.setOnClickListener(v -> finish());
     }
 
-    // ---------------- BIND VIEWS ----------------
     private void bindViews() {
+        tvShopName = findViewById(R.id.tvShopName);
+        tvOwnerName = findViewById(R.id.tvOwnerName);
+        tvBillNo = findViewById(R.id.tvBillNo);
+        tvDate = findViewById(R.id.tvDate);
+        btnBack = findViewById(R.id.btnBack);
+
         etCustomerName = findViewById(R.id.etCustomerName);
         etCustomerMobile = findViewById(R.id.etCustomerMobile);
         etSearchItem = findViewById(R.id.etSearchItem);
         etDiscount = findViewById(R.id.etDiscount);
+
         tvSubtotal = findViewById(R.id.tvSubtotal);
-        tvGST = findViewById(R.id.tvGST);
         tvGrandTotal = findViewById(R.id.tvGrandTotal);
+
         spPaymentMode = findViewById(R.id.spPaymentMode);
         rvBillItems = findViewById(R.id.rvBillItems);
-        btnAddItem = findViewById(R.id.btnAddItem);
         btnGenerateInvoice = findViewById(R.id.btnGenerateInvoice);
     }
 
-    // ---------------- RECYCLER VIEW ----------------
     private void setupRecyclerView() {
         rvBillItems.setLayoutManager(new LinearLayoutManager(this));
-        billAdapter = new BillItemAdapter(billItems);
+        billAdapter = new BillItemAdapter(billItems, this);
         rvBillItems.setAdapter(billAdapter);
     }
 
-    // ---------------- DATABASE ----------------
-    private void setupDatabase() {
-        firestore = FirebaseFirestore.getInstance();
-        StockDBHelper helper = new StockDBHelper(this);
-        db = helper.getWritableDatabase();
-    }
-
-    // ---------------- PAYMENT SPINNER ----------------
     private void setupSpinner() {
         String[] payments = {"Cash", "UPI", "Card"};
         ArrayAdapter<String> adapter = new ArrayAdapter<>(
@@ -86,87 +102,192 @@ public class Create_Bill_Form extends AppCompatActivity {
         spPaymentMode.setAdapter(adapter);
     }
 
-    // ---------------- BUTTONS ----------------
-    private void setupButtons() {
-
-        btnAddItem.setOnClickListener(v -> {
-            String itemName = etSearchItem.getText().toString().trim();
-
-            if (itemName.isEmpty()) {
-                Toast.makeText(this, "Enter item name", Toast.LENGTH_SHORT).show();
-                return;
-            }
-
-            addItemFromStock(itemName);
+    // ================= DROPDOWN AUTO ADD =================
+    private void setupDropdownAutoAdd() {
+        etSearchItem.setOnItemClickListener((parent, view, position, id) -> {
+            String selectedProduct = parent.getItemAtPosition(position).toString();
+            addItemFromFirestore(selectedProduct);
             etSearchItem.setText("");
         });
-
-        btnGenerateInvoice.setOnClickListener(v -> generateBill());
     }
 
-    // ---------------- ADD ITEM ----------------
-    private void addItemFromStock(String name) {
+    // ================= HEADER DATA =================
+    private void loadHeaderData() {
+        String userId = auth.getCurrentUser().getUid();
 
-        if (db == null) {
-            Toast.makeText(this, "Database not available", Toast.LENGTH_SHORT).show();
-            return;
-        }
+        firestore.collection("users")
+                .document(userId)
+                .get()
+                .addOnSuccessListener(doc -> {
+                    String shop = doc.getString("shopName");
+                    String owner = doc.getString("ownerName");
 
-        Cursor c = null;
-        try {
-            c = db.rawQuery(
-                    "SELECT name, size, price, qty FROM stock WHERE name = ?",
-                    new String[]{name}
-            );
+                    tvShopName.setText(shop != null ? shop : "My Shop");
+                    tvOwnerName.setText(owner != null ? owner : "Owner");
+                });
+    }
 
-            if (!c.moveToFirst()) {
-                Toast.makeText(this, "Item not found", Toast.LENGTH_SHORT).show();
-                return;
-            }
+    private void loadBillNumber() {
+        String userId = auth.getCurrentUser().getUid();
 
-            int stockQty = c.getInt(c.getColumnIndexOrThrow("qty"));
-            double price = c.getDouble(c.getColumnIndexOrThrow("price"));
-            String size = c.getString(c.getColumnIndexOrThrow("size"));
+        firestore.collection("users")
+                .document(userId)
+                .collection("bills")
+                .get()
+                .addOnSuccessListener(qs -> {
+                    billCounter = 1000 + qs.size() + 1;
+                    tvBillNo.setText("Bill No: BILL-" + billCounter);
+                });
+    }
 
-            if (stockQty <= 0) {
-                Toast.makeText(this, "Out of stock", Toast.LENGTH_SHORT).show();
-                return;
-            }
+    private void setTodayDate() {
+        SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy", Locale.getDefault());
+        String today = sdf.format(new Date());
+        tvDate.setText("Date: " + today);
+    }
 
-            for (BillItemModel item : billItems) {
-                if (item.name.equalsIgnoreCase(name)) {
-                    item.qty++;
-                    item.total = item.qty * item.price;
-                    subtotal += item.price;
-                    updateTotals();
+    // ================= SEARCH DROPDOWN =================
+    private void loadProductNames() {
+        String userId = auth.getCurrentUser().getUid();
+
+        firestore.collection("users")
+                .document(userId)
+                .collection("products")
+                .get()
+                .addOnSuccessListener(querySnapshot -> {
+                    productNames.clear();
+                    for (DocumentSnapshot doc : querySnapshot) {
+                        String name = doc.getString("productName");
+                        if (name != null) productNames.add(name);
+                    }
+
+                    productAdapter = new ArrayAdapter<>(
+                            this,
+                            android.R.layout.simple_dropdown_item_1line,
+                            productNames
+                    );
+                    etSearchItem.setAdapter(productAdapter);
+                });
+    }
+
+    // ================= ADD ITEM =================
+    private void addItemFromFirestore(String name) {
+        String userId = auth.getCurrentUser().getUid();
+
+        firestore.collection("users")
+                .document(userId)
+                .collection("products")
+                .whereEqualTo("productName", name)
+                .get()
+                .addOnSuccessListener(querySnapshot -> {
+
+                    if (querySnapshot.isEmpty()) {
+                        Toast.makeText(this, "Item not found", Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+
+                    DocumentSnapshot doc = querySnapshot.getDocuments().get(0);
+
+                    String productId = doc.getId();
+                    String itemName = doc.getString("productName");
+                    String category = doc.getString("category");
+                    String subCategory = doc.getString("subCategory"); // NEW
+                    double price = doc.getDouble("price");
+                    Long stockQty = doc.getLong("quantity");
+
+                    if (stockQty == null || stockQty <= 0) {
+                        Toast.makeText(this, "Out of stock", Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+
+                    int stockLimit = stockQty.intValue();
+
+                    for (BillItemModel item : billItems) {
+                        if (item.getProductId().equals(productId)) {
+                            if (item.getQuantity() < stockLimit) {
+                                item.setQuantity(item.getQuantity() + 1);
+                            } else {
+                                Toast.makeText(this, "Stock limit reached", Toast.LENGTH_SHORT).show();
+                            }
+                            billAdapter.notifyDataSetChanged();
+                            updateTotals();
+                            toggleRecyclerVisibility();
+                            return;
+                        }
+                    }
+
+                    BillItemModel newItem = new BillItemModel(
+                            productId,
+                            itemName,
+                            category,
+                            subCategory,
+                            price,
+                            1,
+                            stockLimit
+                    );
+
+                    billItems.add(newItem);
                     billAdapter.notifyDataSetChanged();
-                    return;
-                }
+                    updateTotals();
+                    toggleRecyclerVisibility();
+                });
+    }
+
+    // ================= TOTALS =================
+    private void updateTotals() {
+        subtotal = 0.0;
+        for (BillItemModel item : billItems) {
+            subtotal += item.getTotal();
+        }
+
+        double finalTotal = applyDiscount(subtotal);
+
+        tvSubtotal.setText("Subtotal: ₹" + String.format(Locale.US, "%.2f", subtotal));
+        tvGrandTotal.setText("Final Total: ₹" + String.format(Locale.US, "%.2f", finalTotal));
+    }
+
+    private double applyDiscount(double amount) {
+        String dis = etDiscount.getText().toString().trim();
+        double discount = 0;
+
+        try {
+            if (dis.endsWith("%")) {
+                double percent = Double.parseDouble(dis.replace("%", ""));
+                discount = amount * percent / 100;
+            } else if (!dis.isEmpty()) {
+                discount = Double.parseDouble(dis);
             }
+        } catch (Exception ignored) {}
 
-            BillItemModel item = new BillItemModel(name, size, price);
-            billItems.add(item);
-            subtotal += price;
+        return amount - discount;
+    }
 
-            updateTotals();
-            billAdapter.notifyDataSetChanged();
+    private void setupDiscountListener() {
+        etDiscount.addTextChangedListener(new TextWatcher() {
+            @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+            @Override public void onTextChanged(CharSequence s, int start, int before, int count) {
+                updateTotals();
+            }
+            @Override public void afterTextChanged(Editable s) {}
+        });
+    }
 
-        } catch (Exception e) {
-            Toast.makeText(this, "Add item error: " + e.getMessage(), Toast.LENGTH_LONG).show();
-        } finally {
-            if (c != null) c.close();
+    @Override
+    public void onBillChanged() {
+        updateTotals();
+        toggleRecyclerVisibility();
+    }
+
+    // ================= Recycler Auto Show/Hide =================
+    private void toggleRecyclerVisibility() {
+        if (billItems.isEmpty()) {
+            rvBillItems.setVisibility(View.GONE);
+        } else {
+            rvBillItems.setVisibility(View.VISIBLE);
         }
     }
 
-    // ---------------- TOTALS ----------------
-    private void updateTotals() {
-        gst = subtotal * 0.05;
-        tvSubtotal.setText("₹" + String.format(Locale.US, "%.2f", subtotal));
-        tvGST.setText("₹" + String.format(Locale.US, "%.2f", gst));
-        tvGrandTotal.setText("₹" + String.format(Locale.US, "%.2f", subtotal + gst));
-    }
-
-    // ---------------- GENERATE BILL ----------------
+    // ================= SAVE BILL =================
     private void generateBill() {
 
         if (billItems.isEmpty()) {
@@ -174,53 +295,54 @@ public class Create_Bill_Form extends AppCompatActivity {
             return;
         }
 
-        double discount = 0.0;
-        try {
-            String dis = etDiscount.getText().toString().trim();
-            if (dis.endsWith("%")) {
-                discount = subtotal * Double.parseDouble(dis.replace("%", "")) / 100;
-            } else if (!dis.isEmpty()) {
-                discount = Double.parseDouble(dis);
-            }
-        } catch (Exception e) {
-            Toast.makeText(this, "Invalid discount", Toast.LENGTH_SHORT).show();
-            return;
-        }
-
-        double grandTotal = subtotal + gst - discount;
+        String userId = auth.getCurrentUser().getUid();
+        double finalTotal = applyDiscount(subtotal);
 
         List<Map<String, Object>> itemList = new ArrayList<>();
 
         for (BillItemModel i : billItems) {
             Map<String, Object> map = new HashMap<>();
-            map.put("name", i.name);
-            map.put("qty", i.qty);
-            map.put("price", i.price);
-            map.put("total", i.total);
+            map.put("productId", i.getProductId());
+            map.put("name", i.getName());
+            map.put("category", i.getCategory());
+            map.put("subCategory", i.getSubCategory());
+            map.put("qty", i.getQuantity());
+            map.put("price", i.getPrice());
+            map.put("total", i.getTotal());
             itemList.add(map);
 
-            db.execSQL(
-                    "UPDATE stock SET qty = qty - ? WHERE name = ?",
-                    new Object[]{i.qty, i.name}
-            );
+            firestore.collection("users")
+                    .document(userId)
+                    .collection("products")
+                    .document(i.getProductId())
+                    .update("quantity", FieldValue.increment(-i.getQuantity()));
         }
 
         Map<String, Object> bill = new HashMap<>();
+        bill.put("billNo", "BILL-" + billCounter);
         bill.put("customerName", etCustomerName.getText().toString());
         bill.put("mobile", etCustomerMobile.getText().toString());
-        bill.put("items", itemList);
         bill.put("subtotal", subtotal);
-        bill.put("gst", gst);
-        bill.put("discount", discount);
-        bill.put("grandTotal", grandTotal);
+        bill.put("finalTotal", finalTotal);
+        bill.put("discount", etDiscount.getText().toString());
         bill.put("paymentMode", spPaymentMode.getSelectedItem().toString());
         bill.put("timestamp", new Date());
+        bill.put("items", itemList);
 
-        firestore.collection("bills")
+        firestore.collection("users")
+                .document(userId)
+                .collection("bills")
                 .add(bill)
-                .addOnSuccessListener(doc ->
-                        Toast.makeText(this, "Bill saved successfully", Toast.LENGTH_SHORT).show())
-                .addOnFailureListener(e ->
-                        Toast.makeText(this, "Firestore error: " + e.getMessage(), Toast.LENGTH_LONG).show());
+                .addOnSuccessListener(doc -> {
+                    Toast.makeText(this, "Bill Created: BILL-" + billCounter, Toast.LENGTH_LONG).show();
+
+                    String billId = doc.getId(); // IMPORTANT
+
+                    Intent intent = new Intent(Create_Bill_Form.this, Invoice.class);
+                    intent.putExtra("billId", billId);
+                    startActivity(intent);
+                    finish();
+                });
+
     }
 }

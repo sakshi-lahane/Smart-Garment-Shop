@@ -1,55 +1,52 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- Permissions -->
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
     <application
         android:allowBackup="true"
-        android:dataExtractionRules="@xml/data_extraction_rules"
-        android:fullBackupContent="@xml/backup_rules"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.SmartGarmentShop">
-        <activity
-            android:name=".ViewStock"
-            android:exported="false" />
-        <activity
-            android:name=".UpdateStock"
-            android:exported="false" />
-        <activity
-            android:name=".Product_List"
-            android:exported="false" />
-        <activity
-            android:name=".Add_Stock"
-            android:exported="false" />
-        <activity
-            android:name=".Create_Bill_Form"
-            android:exported="false" />
-        <activity
-            android:name=".Forget_Password"
-            android:exported="false" />
-        <activity
-            android:name=".Login_Page"
-            android:exported="false" />
-        <activity
-            android:name=".Register_Page"
-            android:exported="false" /> <!-- Splash Screen (ONLY LAUNCHER) -->
+
+        <!-- FileProvider -->
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="${applicationId}.provider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/file_paths" />
+        </provider>
+
+        <!-- Activities -->
+        <activity android:name=".Invoice" android:exported="false" />
+        <activity android:name=".ViewStock" android:exported="false" />
+        <activity android:name=".UpdateStock" android:exported="false" />
+        <activity android:name=".Product_List" android:exported="false" />
+        <activity android:name=".Add_Stock" android:exported="false" />
+        <activity android:name=".Create_Bill_Form" android:exported="false" />
+        <activity android:name=".Forget_Password" android:exported="false" />
+        <activity android:name=".Login_Page" android:exported="false" />
+        <activity android:name=".Register_Page" android:exported="false" />
+        <activity android:name=".Welcome_Page" android:exported="false" />
+        <activity android:name=".MainActivity" android:exported="false" />
+
+        <!-- Launcher -->
         <activity
             android:name=".Splash_Screen"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-        </activity> <!-- Welcome Screen -->
-        <activity
-            android:name=".Welcome_Page"
-            android:exported="false" /> <!-- Main Activity (NO LAUNCHER) -->
-        <activity
-            android:name=".MainActivity"
-            android:exported="false" />
+        </activity>
+
     </application>
 
 </manifest>

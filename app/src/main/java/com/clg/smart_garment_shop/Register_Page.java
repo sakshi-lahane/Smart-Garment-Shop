@@ -21,14 +21,12 @@ import java.util.Map;
 
 public class Register_Page extends AppCompatActivity {
 
-    // UI
     private TextInputEditText etShopName, etOwnerName, etEmail,
             etMobile, etPassword, etConfirmPassword;
     private MaterialButton btnCreateAccount;
     private ProgressBar progressRegister;
     private TextView tvLogin;
 
-    // Firebase
     private FirebaseAuth auth;
     private FirebaseFirestore firestore;
 
@@ -39,7 +37,6 @@ public class Register_Page extends AppCompatActivity {
         auth = FirebaseAuth.getInstance();
         firestore = FirebaseFirestore.getInstance();
 
-        // Auto login
         if (auth.getCurrentUser() != null) {
             startActivity(new Intent(this, MainActivity.class));
             finish();
@@ -48,7 +45,6 @@ public class Register_Page extends AppCompatActivity {
 
         setContentView(R.layout.activity_register_page);
 
-        // UI
         etShopName = findViewById(R.id.etShopName);
         etOwnerName = findViewById(R.id.etOwnerName);
         etEmail = findViewById(R.id.etEmail);
@@ -66,8 +62,6 @@ public class Register_Page extends AppCompatActivity {
             finish();
         });
     }
-
-    // ================= CREATE ACCOUNT =================
 
     private void createAccount() {
 
@@ -138,8 +132,6 @@ public class Register_Page extends AppCompatActivity {
                     }
                 });
     }
-
-    // ================= VALIDATION =================
 
     private boolean isValidForm(String shop, String owner,
                                 String email, String mobile,

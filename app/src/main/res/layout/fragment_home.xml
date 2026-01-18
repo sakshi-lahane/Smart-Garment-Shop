@@ -1,7 +1,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
     android:background="#F5F5F5">
 
@@ -10,7 +10,8 @@
 
     <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="0dp"
+        android:layout_weight="1">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -53,15 +54,12 @@
                     android:layout_height="120dp"
                     android:layout_columnWeight="1"
                     android:layout_margin="8dp"/>
-
             </GridLayout>
-
-
 
             <!-- QUICK ACTIONS -->
             <TextView
-                android:layout_height="wrap_content"
                 android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
                 android:text="Quick Actions"
                 android:textSize="18sp"
                 android:textStyle="bold"
@@ -81,9 +79,7 @@
                     android:text="Create Bill"
                     android:textColor="@android:color/white"
                     app:backgroundTint="@color/orange_dark"
-                    app:cornerRadius="12dp"
-                    app:elevation="4dp"/>
-
+                    app:cornerRadius="12dp"/>
 
                 <Space
                     android:layout_width="12dp"
@@ -97,11 +93,10 @@
                     android:text="Add Stock"
                     android:textColor="@android:color/white"
                     app:backgroundTint="@color/orange_dark"
-                    app:cornerRadius="12dp"
-                    app:elevation="4dp"/>
-
+                    app:cornerRadius="12dp"/>
             </LinearLayout>
 
         </LinearLayout>
     </ScrollView>
+
 </LinearLayout>
