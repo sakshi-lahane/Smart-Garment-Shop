@@ -13,6 +13,7 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.appcompat.app.AlertDialog;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -38,10 +39,11 @@ public class ProfileFragment extends Fragment {
         // If user not logged in, go to Login
         if (auth.getCurrentUser() == null) {
             startActivity(new Intent(getActivity(), Login_Page.class));
-            getActivity().finish();
+            requireActivity().finish();
             return view;
         }
 
+        // Initialize views
         tvName = view.findViewById(R.id.tvName);
         tvEmail = view.findViewById(R.id.tvEmail);
         tvPhone = view.findViewById(R.id.tvPhone);
@@ -52,30 +54,40 @@ public class ProfileFragment extends Fragment {
         tvBusinessType = view.findViewById(R.id.tvBusinessType);
 
         btnEditProfile = view.findViewById(R.id.btnEditProfile);
-        btnLogout = view.findViewById(R.id.btnLogout);
+        btnLogout = view.findViewById(R.id.btnLogout);   // 🔥 FIXED
 
         loadProfileData();
 
         btnEditProfile.setOnClickListener(v ->
                 startActivity(new Intent(getActivity(), Edit_Profile.class)));
 
-        btnLogout.setOnClickListener(v -> {
-            auth.signOut();
-            Intent i = new Intent(getActivity(), Login_Page.class);
-            i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-            startActivity(i);
-            getActivity().finish();
-        });
+        btnLogout.setOnClickListener(v -> showLogoutDialog());   // 🔥 FIXED
 
-        return view;
+        return view;   // 🔥 FIXED
     }
 
     @Override
     public void onResume() {
         super.onResume();
         if (auth.getCurrentUser() != null) {
-            loadProfileData(); // Refresh after editing
+            loadProfileData();
         }
+    }
+
+    // 🔥 LOGOUT CONFIRMATION DIALOG
+    private void showLogoutDialog() {
+        new AlertDialog.Builder(requireContext())
+                .setTitle("Logout")
+                .setMessage("Are you sure you want to logout?")
+                .setPositiveButton("Yes", (dialog, which) -> {
+                    auth.signOut();
+                    Intent i = new Intent(getActivity(), Login_Page.class);
+                    i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                    startActivity(i);
+                    requireActivity().finish();
+                })
+                .setNegativeButton("Cancel", (dialog, which) -> dialog.dismiss())
+                .show();
     }
 
     private void loadProfileData() {
@@ -87,7 +99,6 @@ public class ProfileFragment extends Fragment {
                 .addOnSuccessListener(doc -> {
                     if (doc.exists()) {
 
-                        // DEBUG: See what exactly is coming from Firestore
                         Log.d("PROFILE_DATA", doc.getData().toString());
 
                         tvName.setText(getSafe(doc.getString("ownerName")));

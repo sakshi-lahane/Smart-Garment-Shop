@@ -3,12 +3,14 @@ package com.clg.smart_garment_shop;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Patterns;
+import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.android.material.button.MaterialButton;
+import com.google.android.material.progressindicator.CircularProgressIndicator;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.firebase.auth.FirebaseAuth;
 
@@ -17,6 +19,7 @@ public class Login_Page extends AppCompatActivity {
     private TextInputEditText etEmail, etPassword;
     private MaterialButton btnLogin;
     private TextView tvForgetPassword, tvSignUp;
+    private CircularProgressIndicator progressLogin;
 
     private FirebaseAuth auth;
 
@@ -40,6 +43,7 @@ public class Login_Page extends AppCompatActivity {
         btnLogin = findViewById(R.id.btnLogin);
         tvForgetPassword = findViewById(R.id.tvForgotPassword);
         tvSignUp = findViewById(R.id.tvSignup);
+        progressLogin = findViewById(R.id.progressLogin); // NEW
 
         btnLogin.setOnClickListener(v -> loginUser());
 
@@ -57,8 +61,19 @@ public class Login_Page extends AppCompatActivity {
 
         if (!isValidLogin(email, password)) return;
 
+        // Show loader
+        progressLogin.setVisibility(View.VISIBLE);
+        btnLogin.setText("");
+        btnLogin.setEnabled(false);
+
         auth.signInWithEmailAndPassword(email, password)
                 .addOnCompleteListener(task -> {
+
+                    // Hide loader
+                    progressLogin.setVisibility(View.GONE);
+                    btnLogin.setText("Login");
+                    btnLogin.setEnabled(true);
+
 
                     if (task.isSuccessful()) {
 

@@ -11,6 +11,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
@@ -40,14 +41,11 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.ViewHold
         holder.tvTotal.setText("₹" + model.finalTotal);
         holder.tvPayment.setText(model.paymentMode);
 
-        // Format date & time
+        // ✅ Smart Date Format (Today / Yesterday / Full Date + Time)
         if (model.timestamp != null) {
-            Date date = model.timestamp.toDate();
-            SimpleDateFormat dateFormat = new SimpleDateFormat("dd MMM yyyy", Locale.getDefault());
-            SimpleDateFormat timeFormat = new SimpleDateFormat("hh:mm a", Locale.getDefault());
-
-            holder.tvDate.setText(dateFormat.format(date));
-            holder.tvTime.setText(timeFormat.format(date));
+            holder.tvDate.setText(formatSmartDate(model.timestamp.toDate()));
+        } else {
+            holder.tvDate.setText("");
         }
 
         // Click → Open Invoice
@@ -65,16 +63,44 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.ViewHold
 
     static class ViewHolder extends RecyclerView.ViewHolder {
 
-        TextView tvCustomerName, tvDate, tvTime, tvTotal, tvPayment;
+        TextView tvCustomerName, tvDate, tvTotal, tvPayment;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
 
             tvCustomerName = itemView.findViewById(R.id.tvCustomerName);
             tvDate = itemView.findViewById(R.id.tvDate);
-            tvTime = itemView.findViewById(R.id.tvTime);
             tvTotal = itemView.findViewById(R.id.tvTotal);
             tvPayment = itemView.findViewById(R.id.tvPayment);
         }
+    }
+
+    // ================= SMART DATE FORMAT =================
+
+    private String formatSmartDate(Date date) {
+        SimpleDateFormat timeFormat = new SimpleDateFormat("hh:mm a", Locale.getDefault());
+        SimpleDateFormat fullDateFormat = new SimpleDateFormat("dd MMM yyyy", Locale.getDefault());
+
+        Calendar now = Calendar.getInstance();
+        Calendar inputDate = Calendar.getInstance();
+        inputDate.setTime(date);
+
+        String time = timeFormat.format(date);
+
+        if (isSameDay(now, inputDate)) {
+            return "Today, " + time;
+        }
+
+        now.add(Calendar.DAY_OF_YEAR, -1);
+        if (isSameDay(now, inputDate)) {
+            return "Yesterday, " + time;
+        }
+
+        return fullDateFormat.format(date) + ", " + time;
+    }
+
+    private boolean isSameDay(Calendar cal1, Calendar cal2) {
+        return cal1.get(Calendar.YEAR) == cal2.get(Calendar.YEAR)
+                && cal1.get(Calendar.DAY_OF_YEAR) == cal2.get(Calendar.DAY_OF_YEAR);
     }
 }
