@@ -16,7 +16,11 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
 
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ViewHolder> {
 
@@ -42,7 +46,9 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ViewHold
         holder.tvName.setText(model.getProductName());
         holder.tvDetails.setText("Qty: " + model.getQuantity() + " | ₹" + model.getPrice());
 
-        // 🔥 OPEN VIEW PAGE
+        // SAFE DATE
+        holder.tvDate.setText(formatDate(model.getTimestamp()));
+
         holder.itemView.setOnClickListener(v -> {
             Intent intent = new Intent(context, ViewStock.class);
             intent.putExtra("name", model.getProductName());
@@ -55,7 +61,6 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ViewHold
             context.startActivity(intent);
         });
 
-        // ✏️ EDIT
         holder.btnEdit.setOnClickListener(v -> {
             Intent intent = new Intent(context, UpdateStock.class);
             intent.putExtra("id", model.getProductId());
@@ -69,7 +74,6 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ViewHold
             context.startActivity(intent);
         });
 
-        // 🗑 DELETE
         holder.btnDelete.setOnClickListener(v -> {
             showDeleteDialog(model.getProductId(), position);
         });
@@ -108,16 +112,48 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ViewHold
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
-
-        TextView tvName, tvDetails;
+        TextView tvName, tvDetails, tvDate;
         ImageView btnEdit, btnDelete;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
             tvName = itemView.findViewById(R.id.tvName);
             tvDetails = itemView.findViewById(R.id.tvDetails);
+            tvDate = itemView.findViewById(R.id.tvDate);
             btnEdit = itemView.findViewById(R.id.btnEdit);
             btnDelete = itemView.findViewById(R.id.btnDelete);
         }
+    }
+
+    // Today / Yesterday / Date + Time
+    private String formatDate(long timestamp) {
+        if (timestamp <= 0) return "";
+
+        Date date = new Date(timestamp);
+
+        SimpleDateFormat timeFormat = new SimpleDateFormat("hh:mm a", Locale.getDefault());
+        SimpleDateFormat fullDateFormat = new SimpleDateFormat("dd MMM yyyy", Locale.getDefault());
+
+        Calendar now = Calendar.getInstance();
+        Calendar inputDate = Calendar.getInstance();
+        inputDate.setTime(date);
+
+        String time = timeFormat.format(date);
+
+        if (isSameDay(now, inputDate)) {
+            return "Today, " + time;
+        }
+
+        now.add(Calendar.DAY_OF_YEAR, -1);
+        if (isSameDay(now, inputDate)) {
+            return "Yesterday, " + time;
+        }
+
+        return fullDateFormat.format(date) + ", " + time;
+    }
+
+    private boolean isSameDay(Calendar cal1, Calendar cal2) {
+        return cal1.get(Calendar.YEAR) == cal2.get(Calendar.YEAR)
+                && cal1.get(Calendar.DAY_OF_YEAR) == cal2.get(Calendar.DAY_OF_YEAR);
     }
 }

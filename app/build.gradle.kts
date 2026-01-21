@@ -60,6 +60,7 @@ dependencies {
 
     // Print
     implementation("androidx.print:print:1.0.0")
+    implementation(libs.activity)
 
     // Testing
     testImplementation("junit:junit:4.13.2")

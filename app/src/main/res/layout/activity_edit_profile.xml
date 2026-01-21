@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fillViewport="true"
+    android:background="#F7F7F7">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="20dp">
+
+        <!-- Title -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Edit Profile"
+            android:textSize="22sp"
+            android:textStyle="bold"
+            android:gravity="center"
+            android:paddingBottom="16dp" />
+
+        <!-- Card -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="18dp"
+            android:background="@drawable/profile_card_bg">
+
+            <EditText
+                android:id="@+id/etName"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:hint="Owner Name"
+                android:inputType="textPersonName"
+                android:padding="12dp" />
+
+            <EditText
+                android:id="@+id/etPhone"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:hint="Mobile Number"
+                android:inputType="phone"
+                android:layout_marginTop="10dp"
+                android:padding="12dp" />
+
+            <EditText
+                android:id="@+id/etShopName"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:hint="Shop Name"
+                android:layout_marginTop="10dp"
+                android:padding="12dp" />
+
+            <EditText
+                android:id="@+id/etShopAddress"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:hint="Shop Address"
+                android:layout_marginTop="10dp"
+                android:padding="12dp" />
+
+            <EditText
+                android:id="@+id/etCity"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:hint="City"
+                android:layout_marginTop="10dp"
+                android:padding="12dp" />
+
+            <EditText
+                android:id="@+id/etState"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:hint="State"
+                android:layout_marginTop="10dp"
+                android:padding="12dp" />
+
+            <EditText
+                android:id="@+id/etBusinessType"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:hint="Business Type"
+                android:layout_marginTop="10dp"
+                android:padding="12dp" />
+
+            <!-- Buttons Row -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginTop="20dp"
+                android:weightSum="2">
+
+                <Button
+                    android:id="@+id/btnCancel"
+                    android:layout_width="0dp"
+                    android:layout_height="48dp"
+                    android:layout_weight="1"
+                    android:text="Cancel"
+                    android:backgroundTint="#9E9E9E"
+                    android:textColor="@android:color/white"
+                    android:layout_marginEnd="6dp" />
+
+                <Button
+                    android:id="@+id/btnSave"
+                    android:layout_width="0dp"
+                    android:layout_height="48dp"
+                    android:layout_weight="1"
+                    android:text="Save Profile"
+                    android:backgroundTint="@color/orange_dark"
+                    android:textColor="@android:color/white"
+                    android:layout_marginStart="6dp" />
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</ScrollView>

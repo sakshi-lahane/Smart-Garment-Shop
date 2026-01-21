@@ -10,6 +10,7 @@ public class ProductModel {
     private String color;
     private double price;
     private int quantity;
+    private long timestamp;   // MUST be long
 
     public ProductModel() {}
 
@@ -21,6 +22,7 @@ public class ProductModel {
     public String getColor() { return color; }
     public double getPrice() { return price; }
     public int getQuantity() { return quantity; }
+    public long getTimestamp() { return timestamp; }
 
     public void setProductId(String productId) { this.productId = productId; }
     public void setProductName(String productName) { this.productName = productName; }
@@ -30,4 +32,5 @@ public class ProductModel {
     public void setColor(String color) { this.color = color; }
     public void setPrice(double price) { this.price = price; }
     public void setQuantity(int quantity) { this.quantity = quantity; }
+    public void setTimestamp(long timestamp) { this.timestamp = timestamp; }
 }

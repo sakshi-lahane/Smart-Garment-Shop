@@ -5,6 +5,7 @@ import android.os.Bundle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 
+import com.clg.smart_garment_shop.HomeFragment;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 public class MainActivity extends AppCompatActivity {
@@ -18,8 +19,10 @@ public class MainActivity extends AppCompatActivity {
 
         bottomNavigation = findViewById(R.id.bottomNavigation);
 
-        // Default fragment
-        loadFragment(new HomeFragment());
+        // Load default fragment
+        if (savedInstanceState == null) {
+            loadFragment(new HomeFragment());
+        }
 
         bottomNavigation.setOnItemSelectedListener(item -> {
 
@@ -29,8 +32,6 @@ public class MainActivity extends AppCompatActivity {
                 fragment = new HomeFragment();
             } else if (item.getItemId() == R.id.nav_stock) {
                 fragment = new StockFragment();
-            } else if (item.getItemId()== R.id.nav_create_bill){
-                fragment = new CreateFragment();
             } else if (item.getItemId() == R.id.nav_history) {
                 fragment = new HistoryFragment();
             } else if (item.getItemId() == R.id.nav_profile) {
@@ -48,6 +49,7 @@ public class MainActivity extends AppCompatActivity {
                 .beginTransaction()
                 .replace(R.id.fragment_container, fragment)
                 .commit();
+
         return true;
     }
 }

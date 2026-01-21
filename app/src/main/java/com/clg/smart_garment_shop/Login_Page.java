@@ -14,49 +14,47 @@ import com.google.firebase.auth.FirebaseAuth;
 
 public class Login_Page extends AppCompatActivity {
 
-    // UI
     private TextInputEditText etEmail, etPassword;
     private MaterialButton btnLogin;
     private TextView tvForgetPassword, tvSignUp;
 
-    // Firebase
     private FirebaseAuth auth;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_login_page);
 
-        // Firebase
         auth = FirebaseAuth.getInstance();
 
-        // UI init
+        // If already logged in, go directly to MainActivity
+        if (auth.getCurrentUser() != null) {
+            startActivity(new Intent(this, MainActivity.class));
+            finish();
+            return;
+        }
+
+        setContentView(R.layout.activity_login_page);
+
         etEmail = findViewById(R.id.etEmail);
         etPassword = findViewById(R.id.etPassword);
         btnLogin = findViewById(R.id.btnLogin);
         tvForgetPassword = findViewById(R.id.tvForgotPassword);
         tvSignUp = findViewById(R.id.tvSignup);
 
-        // LOGIN BUTTON
         btnLogin.setOnClickListener(v -> loginUser());
 
-        // SIGN UP
         tvSignUp.setOnClickListener(v ->
                 startActivity(new Intent(this, Register_Page.class)));
 
-        // FORGOT PASSWORD
         tvForgetPassword.setOnClickListener(v ->
                 startActivity(new Intent(this, Forget_Password.class)));
     }
-
-    // ================= LOGIN =================
 
     private void loginUser() {
 
         String email = etEmail.getText().toString().trim();
         String password = etPassword.getText().toString().trim();
 
-        // Validation
         if (!isValidLogin(email, password)) return;
 
         auth.signInWithEmailAndPassword(email, password)
@@ -68,7 +66,9 @@ public class Login_Page extends AppCompatActivity {
                                 "Login Successful",
                                 Toast.LENGTH_SHORT).show();
 
-                        startActivity(new Intent(this, MainActivity.class));
+                        Intent i = new Intent(this, MainActivity.class);
+                        i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                        startActivity(i);
                         finish();
 
                     } else {
@@ -79,8 +79,6 @@ public class Login_Page extends AppCompatActivity {
                     }
                 });
     }
-
-    // ================= VALIDATION =================
 
     private boolean isValidLogin(String email, String password) {
 

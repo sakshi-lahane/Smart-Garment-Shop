@@ -41,7 +41,9 @@ public class Product_List extends AppCompatActivity {
 
         etSearch.addTextChangedListener(new TextWatcher() {
             @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+
             @Override public void onTextChanged(CharSequence s, int start, int before, int count) {}
+
             @Override
             public void afterTextChanged(Editable s) {
                 filter(s.toString());
@@ -64,11 +66,18 @@ public class Product_List extends AppCompatActivity {
 
                     for (QueryDocumentSnapshot doc : query) {
                         ProductModel p = doc.toObject(ProductModel.class);
-                        p.setProductId(doc.getId()); // 🔥 VERY IMPORTANT FIX
+                        p.setProductId(doc.getId()); // important
+
+                        // Fallback for old data
+                        if (p.getTimestamp() == 0) {
+                            p.setTimestamp(System.currentTimeMillis());
+                        }
+
                         list.add(p);
                         fullList.add(p);
                     }
-                    adapter.notifyDataSetChanged();
+
+                    adapter.notifyDataSetChanged(); // VERY IMPORTANT
                 })
                 .addOnFailureListener(e ->
                         Toast.makeText(this, "Error: " + e.getMessage(), Toast.LENGTH_SHORT).show()

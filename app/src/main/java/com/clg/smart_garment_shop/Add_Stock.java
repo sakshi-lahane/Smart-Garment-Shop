@@ -12,6 +12,7 @@ import com.google.android.material.button.MaterialButton;
 import com.google.android.material.textfield.MaterialAutoCompleteTextView;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.HashMap;
@@ -152,6 +153,9 @@ public class Add_Stock extends AppCompatActivity {
         productMap.put("price", price);
         productMap.put("quantity", quantity);
 
+            // 🔥 Correct Date & Time
+        productMap.put("timestamp", System.currentTimeMillis());
+
         db.collection("users")
                 .document(userId)
                 .collection("products")
@@ -159,7 +163,7 @@ public class Add_Stock extends AppCompatActivity {
                 .set(productMap)
                 .addOnSuccessListener(unused -> {
                     Toast.makeText(this, "Stock added successfully", Toast.LENGTH_SHORT).show();
-                    startActivity(new Intent(Add_Stock.this, Product_List.class));
+//                    startActivity(new Intent(Add_Stock.this, Product_List.class));
                     finish();
                 })
                 .addOnFailureListener(e ->

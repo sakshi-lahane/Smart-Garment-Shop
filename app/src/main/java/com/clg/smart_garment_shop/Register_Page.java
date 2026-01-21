@@ -90,10 +90,14 @@ public class Register_Page extends AppCompatActivity {
                         String uid = auth.getCurrentUser().getUid();
 
                         Map<String, Object> userMap = new HashMap<>();
-                        userMap.put("shopName", shop);
                         userMap.put("ownerName", owner);
-                        userMap.put("email", email);
                         userMap.put("mobile", mobile);
+                        userMap.put("shopName", shop);
+                        userMap.put("email", email);
+                        userMap.put("shopAddress", "");
+                        userMap.put("city", "");
+                        userMap.put("state", "");
+                        userMap.put("businessType", "");
                         userMap.put("createdAt", System.currentTimeMillis());
 
                         firestore.collection("users")
@@ -105,7 +109,9 @@ public class Register_Page extends AppCompatActivity {
                                             "Account created successfully",
                                             Toast.LENGTH_SHORT).show();
 
-                                    startActivity(new Intent(this, MainActivity.class));
+                                    Intent i = new Intent(this, MainActivity.class);
+                                    i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                                    startActivity(i);
                                     finish();
                                 })
                                 .addOnFailureListener(e -> {
