@@ -153,7 +153,7 @@ public class Add_Stock extends AppCompatActivity {
         productMap.put("price", price);
         productMap.put("quantity", quantity);
 
-            // 🔥 Correct Date & Time
+            //  Correct Date & Time
         productMap.put("timestamp", System.currentTimeMillis());
 
         db.collection("users")

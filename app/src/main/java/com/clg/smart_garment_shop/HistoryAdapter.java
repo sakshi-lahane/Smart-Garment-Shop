@@ -41,7 +41,7 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.ViewHold
         holder.tvTotal.setText("₹" + model.finalTotal);
         holder.tvPayment.setText(model.paymentMode);
 
-        // ✅ Smart Date Format (Today / Yesterday / Full Date + Time)
+        // Smart Date Format
         if (model.timestamp != null) {
             holder.tvDate.setText(formatSmartDate(model.timestamp.toDate()));
         } else {
@@ -55,6 +55,7 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.ViewHold
             context.startActivity(intent);
         });
     }
+
 
     @Override
     public int getItemCount() {

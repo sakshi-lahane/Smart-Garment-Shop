@@ -102,7 +102,7 @@ public class Create_Bill_Form extends AppCompatActivity
         spPaymentMode.setAdapter(adapter);
     }
 
-    // ================= DROPDOWN AUTO ADD =================
+    // DROPDOWN AUTO ADD
     private void setupDropdownAutoAdd() {
         etSearchItem.setOnItemClickListener((parent, view, position, id) -> {
             String selectedProduct = parent.getItemAtPosition(position).toString();
@@ -111,7 +111,7 @@ public class Create_Bill_Form extends AppCompatActivity
         });
     }
 
-    // ================= HEADER DATA =================
+    //  HEADER DATA
     private void loadHeaderData() {
         String userId = auth.getCurrentUser().getUid();
 
@@ -146,7 +146,7 @@ public class Create_Bill_Form extends AppCompatActivity
         tvDate.setText("Date: " + today);
     }
 
-    // ================= SEARCH DROPDOWN =================
+    //  SEARCH DROPDOWN
     private void loadProductNames() {
         String userId = auth.getCurrentUser().getUid();
 
@@ -233,7 +233,7 @@ public class Create_Bill_Form extends AppCompatActivity
                 });
     }
 
-    // ================= TOTALS =================
+    //  TOTALS
     private void updateTotals() {
         subtotal = 0.0;
         for (BillItemModel item : billItems) {
@@ -278,7 +278,7 @@ public class Create_Bill_Form extends AppCompatActivity
         toggleRecyclerVisibility();
     }
 
-    // ================= Recycler Auto Show/Hide =================
+    //  Recycler Auto Show/Hide
     private void toggleRecyclerVisibility() {
         if (billItems.isEmpty()) {
             rvBillItems.setVisibility(View.GONE);
@@ -287,7 +287,7 @@ public class Create_Bill_Form extends AppCompatActivity
         }
     }
 
-    // ================= SAVE BILL =================
+    //  SAVE BILL
     private void generateBill() {
 
         if (billItems.isEmpty()) {
@@ -323,11 +323,19 @@ public class Create_Bill_Form extends AppCompatActivity
         bill.put("customerName", etCustomerName.getText().toString());
         bill.put("mobile", etCustomerMobile.getText().toString());
         bill.put("subtotal", subtotal);
-        bill.put("finalTotal", finalTotal);
+
+        bill.put("finalTotal", finalTotal);            // history + invoice
+        bill.put("totalAmount", finalTotal);          // dashboard
+
         bill.put("discount", etDiscount.getText().toString());
         bill.put("paymentMode", spPaymentMode.getSelectedItem().toString());
-        bill.put("timestamp", new Date());
+
+        bill.put("timestamp", new Date());            // HISTORY (keep old working)
+        bill.put("createdAt", System.currentTimeMillis()); // DASHBOARD (today sales)
+
         bill.put("items", itemList);
+
+
 
         firestore.collection("users")
                 .document(userId)
